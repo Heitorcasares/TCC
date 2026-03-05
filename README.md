@@ -1,3 +1,3 @@
 Ideias para TCC:
 
-- App para calcular dinheiro gasto no fim do mês de energia;
+- App para calcular dinheiro em tempo real de energia;
