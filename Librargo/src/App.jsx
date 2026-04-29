@@ -1,19 +1,20 @@
 import { useState } from 'react'
-import logo from "C:/Users/heito/OneDrive/Área de Trabalho/TCC/Librargo/src/img/libras-removebg-preview.png"
-import usuario from "C:/Users/heito/OneDrive/Área de Trabalho/TCC/Librargo/src/img/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector-removebg-preview.png"
+import { useNavigate } from 'react-router-dom'
+import logo from "./img/libras-removebg-preview.png"
+import usuario from "./img/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector-removebg-preview.png"
 import './App.css'
 
 
 function App() {
-  
+
   return (
     <>
       <div class='nav'>
         <nav>
           <ul>
             <li><img src={logo} style={{width: "60px", height: "60px", paddingTop: "12px", margin: "0", float: "left", position: "relative", top: "7px"}}/></li>
-            <li><h3><a href="#">Home</a></h3></li>
-            <li><h3><a href="#">Comunidades</a></h3></li>
+            <li class="a"><h3><a href="#">Home</a></h3></li>
+            <li class="a"><h3><a href="#">Comunidades</a></h3></li>
             <div class="pesquisa">
               <li><div class="group">
                     <svg viewBox="0 0 24 24" aria-hidden="true" class="search-icon">
@@ -23,7 +24,6 @@ function App() {
                         ></path>
                       </g>
                     </svg>
-
                     <input
                       id="query"
                       class="input"

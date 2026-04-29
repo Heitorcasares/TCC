@@ -6,7 +6,7 @@ ul {
 
 }
 
-ul li a {
+ul li a{
     float: left;
     display: block;
     text-align: center;
@@ -87,6 +87,10 @@ a:hover {
 h1 {
   position: relative;
   top: 230px;
+  left: 13px;
+  font-family: "Beauty", sans-serif;
+  font-weight: 0;
+  font-size: 50px;
 }
 
  
@@ -134,3 +138,20 @@ h1 {
   visibility: visible;
   transform: scale(100) translateX(2px);
 }
+
+@font-face {
+  font-family: 'Amentha';
+  src: local('Amentha'), url('./fonts/Amertha_PERSONAL_USE_ONLY.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Beauty';
+  src: local('Beauty'), url('./fonts/BeautyDemo.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
