@@ -23,6 +23,7 @@ nav {
     background-color:cadetblue;
     border-radius: 2px;
     width: 100%;
+    border-color: black;
 }
 
 .a:hover {

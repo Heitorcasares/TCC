@@ -1,24 +1,29 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Link, Routes, Route, useNavigate } from 'react-router-dom'
 import logo from "./../../img/libras-removebg-preview.png"
 import usuario from "./../../img/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector-removebg-preview.png"
 import './Home.css'
-import Login from '../Login.jsx'
-import Comunidades from '../Comunidades.jsx'
+import Loader from './../../components/Loader.jsx'
 
 
 
 function Home() {
 
 
+  const [ isLoading, setIsLoading ] = useState(false);
+  
+  const Login = () => {
+    setIsLoading(true)
+  }
   return (
     <>
+    
       <div className='nav'>
         <nav>
           <ul>
             <li><Link to='/'><img src={logo} className="logo"/></Link></li>
             <li><h3><Link to="/" className="a">Home</Link></h3></li>
-            <li><h3><Link to='/comunidades' className="a">Comunidades</Link></h3></li>
+            <li><h3><Link to='/comunidades' className="a" onClick={Login}>Comunidades</Link></h3></li>
             <div className="pesquisa">
               <li><div className="group">
                     <svg viewBox="0 0 24 24" aria-hidden="true" className="search-icon">
@@ -44,10 +49,11 @@ function Home() {
       </div>
 
       <h1>Bem-vindo ao Librargo!</h1>
-      <center><Link to='/login'><button className="button type1">
+      <center><Link to='/login'><button className="button type1" onClick={Login}>
         <span className="btn-txt">Começar</span>
       </button></Link></center>
-    
+
+      {isLoading && <Loader/>}
     </>
   )
 }
