@@ -4,22 +4,27 @@ import csv
 import os
 
 
-dataset = "dataset_gestos.csv"
 
 
 
 
 
-if not os.path.exists(dataset):
-    with open(dataset, mode="w", newline="") as f:
+LABEL = "joinha"
+OUTPUT_DIR = f"data/{LABEL}"
+CSV_FILE = "dataset.csv"
+
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+
+header = ["image_path", "label"]
+
+for i in range(21):
+    header += ([f"x{i}"], [f"y{i}"], [f"z{i}"])
+
+if not os.path.exists(CSV_FILE):
+    with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-
-        cabecalho = []
-
-        for i in range(21):
-            cabecalho.extend([f"x{i}"], f"y{i}")
-        cabecalho.append("label")
-        writer.writerow(cabecalho)
+        writer.writerow(header)
 
 video = cv2.VideoCapture(0)
 
@@ -44,10 +49,13 @@ while True:
         for points in handsPoints:
             mpDraw.draw_landmarks(img, points, hand.HAND_CONNECTIONS)
             for id, cord in enumerate(points.landmark):
-                cx, cy = int(cord.x*w), int(cord.y*h)
+                cx, cy, cz = int(cord.x*w), int(cord.y*h), int(cord.z*h)
                 #cv2.putText(img, str(id), (cx, cy+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
-                pontos.append((cx, cy))
+                pontos.append((cx, cy, cz))
 
+
+
+   
 
         dedos = [8, 12, 16, 20]
         contador = 0
@@ -60,13 +68,13 @@ while True:
                     contador +=1
 
         
-        if contador == 0:
-            video.release()
-            cv2.destroyAllWindows()
+        #if contador == 0:
+            #video.release()
+            #cv2.destroyAllWindows()
         
         
-        print(contador)
-        print(pontos)
+        #print(contador)
+        #print(pontos)
 
         
 
