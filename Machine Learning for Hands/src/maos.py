@@ -28,33 +28,37 @@ if not os.path.exists(CSV_FILE):
 
 video = cv2.VideoCapture(0)
 
+frame_count = 0
+
+print("Pressione S para salvar")
+print("Pressione Q para sair")
+
 hand = mp.solutions.hands
 Hand = hand.Hands(max_num_hands=1)
 mpDraw = mp.solutions.drawing_utils
 
-print("SISTEMA DE COLETA INICIADO!")
-print("Faça o gesto na câmera e aperte:")
-print("- 'p' para registrar sinal de PAZ")
-print("- 'j' para registrar sinal de JOINHA")
-print("- 'Esc' para SAIR")
-
 while True:
     check, img = video.read()
+    img = cv2.flip(img, 1)
     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = Hand.process(imgRGB)
     handsPoints = results.multi_hand_landmarks
     h,w,_ = img.shape
     pontos = []
+
+    
+
+
     if handsPoints:
         for points in handsPoints:
             mpDraw.draw_landmarks(img, points, hand.HAND_CONNECTIONS)
             for id, cord in enumerate(points.landmark):
-                cx, cy, cz = int(cord.x*w), int(cord.y*h), int(cord.z*h)
+                cx, cy, cz = int(cord.x), int(cord.y), int(cord.z)
                 #cv2.putText(img, str(id), (cx, cy+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
                 pontos.append((cx, cy, cz))
 
 
-
+        
    
 
         dedos = [8, 12, 16, 20]
@@ -76,6 +80,8 @@ while True:
         #print(contador)
         #print(pontos)
 
+        cv2.putText(img, f"Rotulo: {LABEL}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        cv2.putText(img, "S = salvar | Q = sair", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
         
 
 
@@ -83,5 +89,28 @@ while True:
 
 
     cv2.imshow("IMAGEM", img)
-    cv2.waitKey(1)
+    key = cv2.waitKey(1) & 0xFF
+
+    if key == ord("s"):
+        if points is not None:
+            image_name = f"frame_{frame_count:04d}.jpg"
+            image_path = os.path.join(OUTPUT_DIR, image_name)
+
+            cv2.imwrite(image_path, img)
+
+            row = [image_path, LABEL] + points
+
+            with open(CSV_FILE, mode="a", newline="", encoding="utf-8") as f:
+                writer = csv.writer(f)
+                writer.writerow(row)
+            
+            print(f"Salvo: {image_path}")
+            frame_count += 1
+        else:
+            print("Nenhuma mão detectada. Não salvou.")
+    elif key == ord("q"):
+        break
+
+video.release()
+cv2.destroyAllWindows()
 
