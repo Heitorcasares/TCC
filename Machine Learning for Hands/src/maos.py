@@ -9,7 +9,7 @@ import os
 
 
 
-LABEL = "joinha"
+LABEL = "paz"
 OUTPUT_DIR = f"data/{LABEL}"
 CSV_FILE = "dataset.csv"
 
@@ -53,7 +53,7 @@ while True:
         for points in handsPoints:
             mpDraw.draw_landmarks(img, points, hand.HAND_CONNECTIONS)
             for id, cord in enumerate(points.landmark):
-                cx, cy, cz = int(cord.x), int(cord.y), int(cord.z)
+                cx, cy, cz = int(cord.x*w), int(cord.y*h), int(cord.z)
                 #cv2.putText(img, str(id), (cx, cy+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
                 pontos.append((cx, cy, cz))
 
@@ -98,7 +98,7 @@ while True:
 
             cv2.imwrite(image_path, img)
 
-            row = [image_path, LABEL] + points
+            row = [image_path, LABEL] + pontos
 
             with open(CSV_FILE, mode="a", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
