@@ -43,7 +43,6 @@ while True:
     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = Hand.process(imgRGB)
     handsPoints = results.multi_hand_landmarks
-    h,w,_ = img.shape
     pontos = []
 
     
@@ -53,9 +52,9 @@ while True:
         for points in handsPoints:
             mpDraw.draw_landmarks(img, points, hand.HAND_CONNECTIONS)
             for id, cord in enumerate(points.landmark):
-                cx, cy, cz = int(cord.x*w), int(cord.y*h), int(cord.z)
+                cx, cy, cz = cord.x, cord.y, cord.z
                 #cv2.putText(img, str(id), (cx, cy+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
-                pontos.append((cx, cy, cz))
+                pontos.append([cx, cy, cz])
 
 
         
