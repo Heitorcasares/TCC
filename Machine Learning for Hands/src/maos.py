@@ -9,7 +9,7 @@ import os
 
 
 
-LABEL = "paz"
+LABEL = "Joinha"
 OUTPUT_DIR = f"data/{LABEL}"
 CSV_FILE = "dataset.csv"
 
@@ -43,6 +43,7 @@ while True:
     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = Hand.process(imgRGB)
     handsPoints = results.multi_hand_landmarks
+    w, h, _ = img.shape
     pontos = []
 
     
@@ -52,23 +53,15 @@ while True:
         for points in handsPoints:
             mpDraw.draw_landmarks(img, points, hand.HAND_CONNECTIONS)
             for id, cord in enumerate(points.landmark):
-                cx, cy, cz = cord.x, cord.y, cord.z
+                cx = int(cord.x*w) 
+                cy = int(cord.y*h)
+                cz = float(cord.z)
                 #cv2.putText(img, str(id), (cx, cy+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
-                pontos.append([cx, cy, cz])
-
+                pontos.extend([cx, cy, cz])
 
         
    
 
-        dedos = [8, 12, 16, 20]
-        contador = 0
-
-        if points:
-            if pontos[4][0] < pontos[2][0]:
-                contador +=1
-            for x in dedos:
-                if pontos[x][1] < pontos[ x-2 ][1]:
-                    contador +=1
 
         
         #if contador == 0:
