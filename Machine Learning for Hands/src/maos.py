@@ -9,7 +9,7 @@ import os
 
 
 
-LABEL = "Joinha"
+LABEL = "Mao_Aberta"
 OUTPUT_DIR = f"data/{LABEL}"
 CSV_FILE = "dataset.csv"
 
