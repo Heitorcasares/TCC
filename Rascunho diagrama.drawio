@@ -1,0 +1,109 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Página-1" id="wYXpeo_ce_ZWxQ8RykL8">
+    <mxGraphModel dx="1664" dy="914" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-11" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="KNSsuraX2aUS_bW-TMGM-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-1" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Profissional" vertex="1">
+          <mxGeometry height="60" width="30" x="80" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-19" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="KNSsuraX2aUS_bW-TMGM-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-2" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Capturar imagem da escrita" vertex="1">
+          <mxGeometry height="80" width="120" x="414" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-30" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="KNSsuraX2aUS_bW-TMGM-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-3" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Abrir Câmera&amp;nbsp;" vertex="1">
+          <mxGeometry height="80" width="120" x="630" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-45" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="KNSsuraX2aUS_bW-TMGM-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-4" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Compartilhar relatório" vertex="1">
+          <mxGeometry height="80" width="120" x="190" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-32" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="KNSsuraX2aUS_bW-TMGM-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-5" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Fazer Upload da Imagem" vertex="1">
+          <mxGeometry height="80" width="120" x="630" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-21" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="KNSsuraX2aUS_bW-TMGM-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-6" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Realizar avaliação da escrita" vertex="1">
+          <mxGeometry height="80" width="120" x="180" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-24" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="KNSsuraX2aUS_bW-TMGM-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-7" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Capturar vídeo da mão" vertex="1">
+          <mxGeometry height="80" width="120" x="414" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-8" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Visualizar resultado da avaliação" vertex="1">
+          <mxGeometry height="80" width="120" x="190" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-9" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Gerar Relatório da Avaliação" vertex="1">
+          <mxGeometry height="80" width="120" x="1352" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-14" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.388;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;" target="KNSsuraX2aUS_bW-TMGM-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-15" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="354" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-25" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="490" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-28" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="354" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-29" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Analisar Posicionamento da Mão" vertex="1">
+          <mxGeometry height="80" width="120" x="846" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-31" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Analisar espaço e legibilidade" vertex="1">
+          <mxGeometry height="80" width="120" x="846" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-38" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="KNSsuraX2aUS_bW-TMGM-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-33" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Gravar Resultados no histórico do paciente" vertex="1">
+          <mxGeometry height="80" width="120" x="1110" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-34" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.108;entryY=0.263;entryDx=0;entryDy=0;entryPerimeter=0;" target="KNSsuraX2aUS_bW-TMGM-33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-37" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.075;entryY=0.263;entryDx=0;entryDy=0;entryPerimeter=0;endArrow=none;endFill=0;" target="KNSsuraX2aUS_bW-TMGM-33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-40" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=none;startFill=0;endArrow=none;endFill=0;" target="KNSsuraX2aUS_bW-TMGM-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-41" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" target="KNSsuraX2aUS_bW-TMGM-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-39" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Profissional" vertex="1">
+          <mxGeometry height="60" width="30" x="80" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-42" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="130" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-49" edge="1" parent="1" source="KNSsuraX2aUS_bW-TMGM-44" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" target="KNSsuraX2aUS_bW-TMGM-48">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-44" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Paciente&amp;nbsp;" vertex="1">
+          <mxGeometry height="60" width="30" x="440" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="KNSsuraX2aUS_bW-TMGM-48" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Receber Relatório" vertex="1">
+          <mxGeometry height="80" width="120" x="570" y="550" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
