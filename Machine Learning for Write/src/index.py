@@ -1,29 +1,39 @@
-import functions as f
-import cv2
+import extrair_carac as ec
+import train.train as tr
 import numpy as np
 
-def extrair_caracteristicas(caminho):
+def analisar_escrita(caminho):
 
-    gray, binaria = f.upload_imagem(caminho)
+    caracteristicas = ec.extrair_caracteristicas(
+        caminho
+    )
 
-    componentes = f.encontrar_objetos(binaria)
+    caracteristicas = caracteristicas.reshape(1, -1)
 
-    if len(componentes) < 5:
-        raise ValueError("Pouca escrita detectada na imagem!")
+    previsao = tr.modelo.predict(caracteristicas)[0]
 
-    linhas = f.detectar_linhas(componentes)
+    previsao = np.clip(previsao, 0, 1)
 
-    tamanho = f.caracteristicas_tamanho(componentes, binaria.shape)
+    legibilidade = previsao[0] * 100
+    alinhamento = previsao[1] * 100
+    forma = previsao[2] * 100
+    tamanho = previsao[3] * 100
 
-    alinhamento = f.caracteristicas_alinhamento(linhas)
-
-    forma = f.caracteristicas_hog(binaria, componentes)
-
-    gerais = f.caracteristicas_gerais(binaria, componentes)
-
-    return np.concatenate([
-        tamanho,
+    nota_final = np.mean([
+        legibilidade,
         alinhamento,
         forma,
-        gerais
+        tamanho
     ])
+
+    return {
+        "legibilidade": legibilidade,
+        "alinhamento": alinhamento,
+        "forma": forma,
+        "tamanho": tamanho,
+        "nota_final": nota_final
+    }
+
+resultado = analisar_escrita()
+
+print(resultado)
