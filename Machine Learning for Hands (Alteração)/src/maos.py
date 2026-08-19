@@ -9,14 +9,11 @@ import os
 
 
 
-LABEL = "Palmar"
-OUTPUT_DIR = f"data/{LABEL}"
+LABEL = "Pinca"
 CSV_FILE = "dataset.csv"
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-
-header = ["image_path", "label"]
+header = ["label"]
 
 for i in range(21):
     header += ([f"x{i}"], [f"y{i}"], [f"z{i}"])
@@ -85,18 +82,13 @@ while True:
 
     if key == ord("s"):
         if points is not None:
-            image_name = f"frame_{frame_count:04d}.jpg"
-            image_path = os.path.join(OUTPUT_DIR, image_name)
 
-            cv2.imwrite(image_path, img)
 
-            row = [image_path, LABEL] + pontos
+            row = [LABEL] + pontos
 
             with open(CSV_FILE, mode="a", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow(row)
-            
-            print(f"Salvo: {image_path}")
             frame_count += 1
         else:
             print("Nenhuma mão detectada. Não salvou.")

@@ -4,9 +4,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 
-opcsv = pd.read_csv("C:/Users/CAMARGO/Desktop/TCC/Machine Learning for Hands/dataset.csv")
+opcsv = pd.read_csv("C:/Users/Camargo/Desktop/TCC/Machine Learning for Hands (Alteração)/dataset.csv")
 
-X = opcsv.drop(columns=["label", "image_path"])
+X = opcsv.drop(columns=["label"])
 Y = opcsv["label"]
 
 X_train, X_test, Y_train, Y_test = train_test_split(
