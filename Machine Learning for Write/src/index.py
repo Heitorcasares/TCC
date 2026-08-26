@@ -1,5 +1,5 @@
 import extrair_carac as ec
-import train.train as tr
+import train as tr
 import numpy as np
 
 def analisar_escrita(caminho):
@@ -34,6 +34,6 @@ def analisar_escrita(caminho):
         "nota_final": nota_final
     }
 
-resultado = analisar_escrita()
+resultado = analisar_escrita("C:/Users/Camargo/Desktop/TCC/Machine Learning for Write/models/e01.png")
 
 print(resultado)

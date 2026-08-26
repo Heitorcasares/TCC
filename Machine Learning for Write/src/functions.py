@@ -11,7 +11,7 @@ def upload_imagem(imagem):
     if imagem is None:
         raise ValueError("Faça o upload da imagem!")
 
-    togray = cv2.cvtColor(imagem, cv2.COLOR_BGR2GRAY)
+    togray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     altura, largura = togray.shape
 
@@ -68,7 +68,7 @@ def encontrar_objetos(binaria):
 
 def caracteristicas_tamanho(componentes, image_shape):
 
-    altura_img, largura_img = image_shape.shape
+    altura_img, largura_img = image_shape
 
     alturas = np.array([
         c["h"]
@@ -113,7 +113,7 @@ def detectar_linhas(componentes):
     altura_mediana = np.median(alturas)
 
     coordenadas_y = np.array([
-        [c["cy"]]
+        [c["y"]]
         for c in componentes
     ])
 
@@ -194,7 +194,7 @@ def caracteristicas_hog(gray):
 
     imagem = cv2.resize(gray, (256, 256))
 
-    caracteristicas, = hog(
+    caracteristicas = hog(
         imagem,
         orientations=9,
         pixels_per_cell=(16, 16),

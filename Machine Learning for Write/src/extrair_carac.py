@@ -17,7 +17,7 @@ def extrair_caracteristicas(caminho):
 
     alinhamento = f.caracteristicas_alinhamento(linhas)
 
-    forma = f.caracteristicas_hog(binaria, componentes)
+    forma = f.caracteristicas_hog(binaria)
 
     gerais = f.caracteristicas_gerais(binaria, componentes)
 
@@ -27,3 +27,9 @@ def extrair_caracteristicas(caminho):
         forma,
         gerais
     ])
+
+resultado = extrair_caracteristicas("C:/Users/Camargo/Desktop/TCC/Machine Learning for Write/models/e01.png")
+
+print(resultado)
+
+
