@@ -1,39 +1,28 @@
-import extrair_carac as ec
-import train as tr
+import cv2
 import numpy as np
 
-def analisar_escrita(caminho):
 
-    caracteristicas = ec.extrair_caracteristicas(
-        caminho
+def dados_escrita(path):
+
+    # Transformar imagem em cinza e depois converter para fundo preto e letra branca
+    img = cv2.imread(path)
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    binaria, _ = cv2.threshold(
+        gray,
+        0,
+        255,
+        cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
     )
 
-    caracteristicas = caracteristicas.reshape(1, -1)
 
-    previsao = tr.modelo.predict(caracteristicas)[0]
+    # Retirar características de toda a frase
+    total, labels, stats, centroids = cv2.connectedComponentsWithStats(
+        binaria,
+        connectivity=8
+    )
 
-    previsao = np.clip(previsao, 0, 1)
+    largura_bi, altura_bi = binaria.sha
 
-    legibilidade = previsao[0] * 100
-    alinhamento = previsao[1] * 100
-    forma = previsao[2] * 100
-    tamanho = previsao[3] * 100
 
-    nota_final = np.mean([
-        legibilidade,
-        alinhamento,
-        forma,
-        tamanho
-    ])
-
-    return {
-        "legibilidade": legibilidade,
-        "alinhamento": alinhamento,
-        "forma": forma,
-        "tamanho": tamanho,
-        "nota_final": nota_final
-    }
-
-resultado = analisar_escrita("C:/Users/Camargo/Desktop/TCC/Machine Learning for Write/models/e01.png")
-
-print(resultado)
