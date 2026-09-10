@@ -102,6 +102,7 @@ def dados_escrita(path):
     grupos = modelo.fit_predict(y)
 
     linhas = []
+    espacamento = []
 
     for grupo in set(grupos):
         if grupo == -1:
@@ -118,6 +119,7 @@ def dados_escrita(path):
 
         inclinacoes = []
         erros = []
+        desvios = []
 
         for linha in linhas:
 
@@ -143,6 +145,13 @@ def dados_escrita(path):
 
             residuos = Y - esperado
 
+            desvio = np.std(residuos)
+
+            desvios.append(desvio)
+
+            desvio_linha = np.mean(desvios)
+
+
             erro = (
                 np.std(residuos) / (altura_mediana + 1e-8)
             )
@@ -153,6 +162,22 @@ def dados_escrita(path):
 
             erros.append(erro)
 
+            l = sorted(linha, key=lambda c: c["x"])
+
+            for i in range(len(linha) - 1):
+                
+                atual = linha[i]
+                proxima = linha[i + 1]
+
+                espaco = proxima["x"] - (
+                    atual["x"] + atual["w"]
+                )
+
+                espacamento.append(espaco)
+            
+            espacamento_letras = np.median(espacamento)
+            regularidade_espacamento = np.std(espacamento)
+
         if not erros:
             erros = [0, 0, 0, 0]
 
@@ -160,6 +185,8 @@ def dados_escrita(path):
         difereca_erros = np.std(erros)
         media_inclinacoes = np.mean(inclinacoes)
         diferenca_inclinacoes = np.std(inclinacoes)
+
+
 
         imagem = cv2.resize(gray, (256, 256))
 
@@ -179,6 +206,13 @@ def dados_escrita(path):
         medias_desvios = np.concatenate([medias, desvios])
 
         densidade = (np.count_nonzero(binaria) / binaria.size)
+
+        densidades = [
+            c["area"] / (c["w"] * c["h"])
+            for c in componentes
+        ]
+
+        grossura_traco = np.median(densidades)
 
         quantidade_componentes = (len(componentes) / (largura * altura))
 
