@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 from sklearn.cluster import DBSCAN
+from sklearn.linear_model import LinearRegression
+from skimage.feature import hog
+import pandas as pd
 
 
 def dados_escrita(path):
@@ -10,7 +13,7 @@ def dados_escrita(path):
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    _, binaria = cv2.threshold(
+    _ , binaria = cv2.threshold(
         gray,
         0,
         255,
@@ -96,7 +99,7 @@ def dados_escrita(path):
         min_samples= 3
     )
 
-    grupos = modelo.fit_predict(x, y)
+    grupos = modelo.fit_predict(y)
 
     linhas = []
 
@@ -118,22 +121,108 @@ def dados_escrita(path):
 
         for linha in linhas:
 
+            print("Bão")
+            
             if len(linha) < 3:
                 continue
 
             X = np.array([
-                [c["cx"]]
+                [c["x"]]
                 for c in linha
             ]).reshape(-1, 1)
 
             Y = np.array([
-                c["cy"]
+                c["y"]
                 for c in linha
             ])
 
+            regressao = LinearRegression()
+            regressao.fit(X, Y)
+
+            esperado = regressao.predict(X)
+
+            residuos = Y - esperado
+
+            erro = (
+                np.std(residuos) / (altura_mediana + 1e-8)
+            )
+
+            inclinacoes.append(
+                abs(regressao.coef_[0])
+            )
+
+            erros.append(erro)
+
+        if not erros:
+            erros = [0, 0, 0, 0]
+
+        media_erros = np.mean(erros)
+        difereca_erros = np.std(erros)
+        media_inclinacoes = np.mean(inclinacoes)
+        diferenca_inclinacoes = np.std(inclinacoes)
+
+        imagem = cv2.resize(gray, (256, 256))
+
+        caracteristicas = hog(
+            imagem,
+            orientations = 9,
+            pixels_per_cell = (16, 16),
+            cells_per_block = (1, 1),
+            feature_vector = False
+        )
+
+        caracteristicas = caracteristicas.reshape(-1, 9)
+
+        medias = caracteristicas.mean(axis=0)
+        desvios = caracteristicas.std(axis=0)
+
+        medias_desvios = np.concatenate([medias, desvios])
+
+        densidade = (np.count_nonzero(binaria) / binaria.size)
+
+        quantidade_componentes = (len(componentes) / (largura * altura))
+
+        areas = np.array([
+            c["area"]
+            for c in componentes
+        ])
+
+        if len(areas) == 0:
+            areas = [0, 0, 0]
+
+        variacao_area = (
+            np.std(areas) / (np.mean(areas) + 1e-8)
+        )
+
+        return ({
+            "Altura relativa": altura_relativa,
+            "Variação de altura": variacao_altura,
+            "Largura Relativa": largura_relativa,
+            "Variação de largura": variacao_largura,
+            "Média de erros": media_erros,
+            "Diferença  de erros": difereca_erros,
+            "Média de inclinações": media_inclinacoes,
+            "Diferença de inclinações": diferenca_inclinacoes,
+            "Médias e desvios": medias_desvios,
+            "Densidade": densidade,
+            "Quantidade de componentes": quantidade_componentes,
+            "Variação da Área": variacao_area
+        })
+
+
+
+        
+
+        
+
     
 
-#print(dados_escrita("C:/Users/Camargo/Desktop/TCC/Machine Learning for Write/models/e01.png"))
+print(pd.DataFrame(dados_escrita("models/e01.png")))
+
+tabela_dados = pd.DataFrame(dados_escrita("models/e01.png"))
+
+tabela_dados.to_csv("Dados.csv", index=False)
+tabela_dados.to_excel("Dados.xlsx", index=False)
 
 
 
