@@ -4,7 +4,11 @@ from sklearn.cluster import DBSCAN
 from sklearn.linear_model import LinearRegression
 from skimage.feature import hog
 import pandas as pd
+from skimage.morphology import skeletonize 
 
+
+def normalizar(valor, referencia):
+    return float(np.clip(valor / referencia, 0, 1))
 
 def dados_escrita(path):
 
@@ -70,6 +74,11 @@ def dados_escrita(path):
 
     altura_mediana = np.median(all_height)
     altura_relativa = altura_mediana/altura
+
+    tamanho_letra = normalizar(
+        altura_relativa,
+        referencia=0.10
+    )
 
     variacao_altura = (
         np.std(all_height) / (np.mean(all_height) + 1e-8)
@@ -162,7 +171,17 @@ def dados_escrita(path):
 
             erros.append(erro)
 
+            erro_relativo = (
+                np.sqrt(np.mean(residuos ** 2)) / altura_mediana
+            )
+
+            alinhamento = np.exp(
+                -np.log(2) * erro_relativo / 0.15
+            )
+
             l = sorted(linha, key=lambda c: c["x"])
+
+            
 
             for i in range(len(linha) - 1):
                 
@@ -174,9 +193,18 @@ def dados_escrita(path):
                 )
 
                 espacamento.append(espaco)
-            
-            espacamento_letras = np.median(espacamento)
-            regularidade_espacamento = np.std(espacamento)
+
+                espacos = np.maximum(
+                    0,
+                    espacamento
+                )
+
+                espaco_relativo = np.median(espacos) / altura_mediana
+
+                espacamento_def = normalizar(
+                    espaco_relativo,
+                    referencia=0.50
+                )
 
         if not erros:
             erros = [0, 0, 0, 0]
@@ -228,19 +256,46 @@ def dados_escrita(path):
             np.std(areas) / (np.mean(areas) + 1e-8)
         )
 
+        distancias = cv2.distanceTransform(
+            binaria,
+            cv2.DIST_L2,
+            cv2.DIST_MASK_PRECISE
+        )
+
+        esqueleto = skeletonize(binaria > 0)
+
+        grossura_px = np.median(
+            2 * distancias[esqueleto]
+        )
+
+        grossura_relativa = grossura_px / altura_mediana
+
+        grossura = normalizar(
+            grossura_relativa,
+            referencia=0.20
+        )
+
+        regularidade_altura = np.exp(-variacao_altura)
+
+        variacao_espacamento = (
+            np.std(espaco_relativo) / (np.mean(espaco_relativo) + 1e-8)
+        )
+        
+        regularidade_espacamento = np.exp(
+            -variacao_espacamento
+        )
+
+        legibilidade_estimada = (
+            0.50 * alinhamento + 0.30 * regularidade_altura + 0.20 * regularidade_espacamento
+        )
+        
+
         return ({
-            "Altura relativa": altura_relativa,
-            "Variação de altura": variacao_altura,
-            "Largura Relativa": largura_relativa,
-            "Variação de largura": variacao_largura,
-            "Média de erros": media_erros,
-            "Diferença  de erros": difereca_erros,
-            "Média de inclinações": media_inclinacoes,
-            "Diferença de inclinações": diferenca_inclinacoes,
-            "Médias e desvios": medias_desvios,
-            "Densidade": densidade,
-            "Quantidade de componentes": quantidade_componentes,
-            "Variação da Área": variacao_area
+            "Legibilidade Estimada": legibilidade_estimada * 100,
+            "Tamanho da Letra": tamanho_letra * 100,
+            "Se está na mesma linha": alinhamento * 100,
+            "esçamento entre letras": espacamento_def * 100,
+            "Grossura do Traço": grossura * 100
         })
 
 
@@ -251,9 +306,9 @@ def dados_escrita(path):
 
     
 
-print(pd.DataFrame(dados_escrita("models/e01.png")))
+print(pd.DataFrame([dados_escrita("models/e01.png")]))
 
-tabela_dados = pd.DataFrame(dados_escrita("models/e01.png"))
+tabela_dados = pd.DataFrame([dados_escrita("models/e01.png")])
 
 tabela_dados.to_csv("Dados.csv", index=False)
 tabela_dados.to_excel("Dados.xlsx", index=False)
