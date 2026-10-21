@@ -15,10 +15,21 @@ def dados_escrita(path):
     # Transformar imagem em cinza e depois converter para fundo preto e letra branca
     img = cv2.imread(path)
 
+    if img is None:
+        raise ValueError(
+            "Não foi possível abrir a imagem"
+        )
+
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    _ , binaria = cv2.threshold(
+    gray_suave = cv2.GaussianBlur(
         gray,
+        (5, 5),
+        0
+    )
+
+    _ , binaria = cv2.threshold(
+        gray_suave,
         0,
         255,
         cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
@@ -72,7 +83,13 @@ def dados_escrita(path):
         for c in componentes
     ])
 
-    altura_mediana = np.median(all_height)
+    if len(componentes) < 5:
+            return []
+
+    altura_mediana = float(np.median(all_height))
+    if altura_mediana <= 0:
+        return None
+    
     altura_relativa = altura_mediana/altura
 
     tamanho_letra = normalizar(
@@ -90,8 +107,7 @@ def dados_escrita(path):
         np.std(all_width) / (np.mean(all_width) + 1e-8)
     )
 
-    if len(componentes) < 5:
-        return []
+    
 
     y = np.array([
         [c["y"]]
@@ -310,8 +326,7 @@ print(pd.DataFrame([dados_escrita("models/e01.png")]))
 
 tabela_dados = pd.DataFrame([dados_escrita("models/e01.png")])
 
-tabela_dados.to_csv("Dados.csv", index=False)
-tabela_dados.to_excel("Dados.xlsx", index=False)
+
 
 
 
