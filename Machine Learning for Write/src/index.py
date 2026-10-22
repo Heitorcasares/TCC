@@ -322,9 +322,9 @@ def dados_escrita(path):
 
     
 
-print(pd.DataFrame([dados_escrita("models/e01.png")]))
+print(pd.DataFrame([dados_escrita("models/e03.jpeg")]))
 
-tabela_dados = pd.DataFrame([dados_escrita("models/e01.png")])
+tabela_dados = pd.DataFrame([dados_escrita("models/e03.jpeg")])
 
 
 
