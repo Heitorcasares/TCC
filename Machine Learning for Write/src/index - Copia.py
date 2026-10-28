@@ -1,4 +1,3 @@
-
 import cv2
 import numpy as np
 import pandas as pd
@@ -9,60 +8,44 @@ from skimage.morphology import skeletonize
 
 
 def normalizar(valor, referencia):
+    """Limita valor/referencia ao intervalo de 0 a 1."""
     if referencia <= 0 or not np.isfinite(valor):
         return 0.0
     return float(np.clip(valor / referencia, 0, 1))
 
 
-def dados_escrita(path):
-    img = cv2.imread(path)
+def dados_escrita(path, texto_referencia=None, numero_letras=None):
+    """Analisa uma imagem de escrita.
 
+    Para uma palavra conectada em um único componente, informe o texto que a
+    criança copiou (texto_referencia="palavra") ou numero_letras=... . Nesse
+    caso, calcula-se uma estimativa separada de largura média por letra. Ela
+    NÃO é uma medição direta dos espaços entre letras.
+    """
+    img = cv2.imread(path)
     if img is None:
         raise ValueError(f"Imagem inválida ou caminho incorreto: {path}")
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     altura, largura = gray.shape
-
     if altura < 10 or largura < 10:
         raise ValueError("Imagem muito pequena para análise.")
 
-    # 1. Binarização
+    # 1. Binarização. Não remover linhas verticais automaticamente, pois
+    # isso pode apagar hastes reais das letras.
     gray_suave = cv2.GaussianBlur(gray, (5, 5), 0)
-
     _, binaria = cv2.threshold(
         gray_suave, 0, 255,
         cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
     )
 
-    # 2. Remover linhas longas do papel, quando detectáveis.
-    # Isso ajuda em folhas pautadas, mas não garante remover todas.
-    horizontal_kernel = cv2.getStructuringElement(
-        cv2.MORPH_RECT, (max(20, largura // 20), 1)
-    )
-    vertical_kernel = cv2.getStructuringElement(
-        cv2.MORPH_RECT, (1, max(20, altura // 20))
-    )
-
-    linhas_h = cv2.morphologyEx(
-        binaria, cv2.MORPH_OPEN, horizontal_kernel
-    )
-    linhas_v = cv2.morphologyEx(
-        binaria, cv2.MORPH_OPEN, vertical_kernel
-    )
-
-    linhas_papel = cv2.bitwise_or(linhas_h, linhas_v)
-    binaria_limpa = cv2.subtract(binaria, linhas_papel)
-
-    # Se a remoção apagar quase toda a escrita, usar imagem original.
-    if np.count_nonzero(binaria_limpa) < 0.15 * np.count_nonzero(binaria):
-        binaria_limpa = binaria.copy()
-
-    # 3. Componentes conectados
+    # 2. Componentes conectados
     total, labels, stats, centroids = cv2.connectedComponentsWithStats(
-        binaria_limpa, connectivity=8
+        binaria, connectivity=8
     )
 
     componentes = []
+    area_minima = max(8, int(altura * largura * 0.00005))
 
     for i in range(1, total):
         x = int(stats[i, cv2.CC_STAT_LEFT])
@@ -71,159 +54,182 @@ def dados_escrita(path):
         h = int(stats[i, cv2.CC_STAT_HEIGHT])
         area = int(stats[i, cv2.CC_STAT_AREA])
 
-        if area < 8:
-            continue
-
-        if area > altura * largura * 0.20:
+        # Preservar componentes grandes: uma palavra cursiva inteira pode
+        # ser um único componente. O filtro superior descarta apenas áreas
+        # quase tão grandes quanto a imagem inteira.
+        if area < area_minima or area > altura * largura * 0.80:
             continue
 
         componentes.append({
             "x": x, "y": y, "w": w, "h": h, "area": area,
             "cx": x + w / 2,
-            "cy": y + h / 2
+            "cy": y + h / 2,
+            "base": y + h
         })
 
-    # 4. Criar máscara global da escrita.
-    # A análise global continua funcionando mesmo com um único
-    # componente conectado.
-    mascara = binaria_limpa > 0
-    ys, xs = np.where(mascara)
-
-    if len(xs) == 0:
+    if not componentes:
         return {
             "Legibilidade Estimada": 0.0,
             "Tamanho da Letra": 0.0,
             "Se está na mesma linha": 0.0,
-            "Dispersão entre componentes": 0.0,
+            "Dispersão entre componentes (%)": None,
+            "Dispersão estimada por largura/letra (%)": None,
+            "Número de letras de referência": None,
             "Grossura do Traço": 0.0,
             "Componentes Detectados": 0,
-            "Método de Análise": "Sem escrita detectável"
+            "Método de alinhamento": "Sem componentes detectados",
+            "Método da dispersão": "Sem escrita detectável"
         }
 
-    # Medida global de altura da escrita
-    altura_escrita = float(ys.max() - ys.min() + 1)
-    largura_escrita = float(xs.max() - xs.min() + 1)
+    # 3. Caixa total ocupada pela escrita
+    x_min = min(c["x"] for c in componentes)
+    y_min = min(c["y"] for c in componentes)
+    x_max = max(c["x"] + c["w"] - 1 for c in componentes)
+    y_max = max(c["y"] + c["h"] - 1 for c in componentes)
 
-    # Usar componentes disponíveis; se houver poucos, estimar
-    # a escala a partir da altura global da escrita.
-    if componentes:
-        alturas = np.array([c["h"] for c in componentes], dtype=float)
-        altura_mediana = float(np.median(alturas))
+    largura_escrita = max(1, x_max - x_min + 1)
+    altura_escrita = max(1, y_max - y_min + 1)
+    alturas = np.array([c["h"] for c in componentes], dtype=float)
+
+    # Uma caixa única contém a palavra inteira, não uma letra. Para esse
+    # caso, usa-se uma estimativa de corpo de letra (60% da altura do bloco).
+    # Esse fator é heurístico e deve ser calibrado com imagens anotadas.
+    if len(componentes) == 1:
+        altura_mediana = max(1.0, 0.60 * altura_escrita)
     else:
-        alturas = np.array([], dtype=float)
-        altura_mediana = altura_escrita
+        altura_mediana = max(float(np.median(alturas)), 1.0)
 
-    if altura_mediana <= 0:
-        altura_mediana = 1.0
+    tamanho_letra = float(np.clip(
+        altura_mediana / altura_escrita * 100, 0, 100
+    ))
 
-    tamanho_letra = normalizar(
-        altura_mediana / altura,
-        referencia=0.10
-    )
-
-    # 5. Regularidade da altura.
-    # Com poucos componentes, usar um valor neutro e indicar
-    # a limitação, em vez de interromper toda a análise.
-    if len(alturas) >= 2:
+    # 4. Regularidade das alturas
+    if len(alturas) >= 3:
+        mediana_h = float(np.median(alturas))
+        alturas_corpo = alturas[
+            (alturas >= 0.50 * mediana_h) &
+            (alturas <= 1.60 * mediana_h)
+        ]
+        if len(alturas_corpo) >= 2:
+            variacao_altura = (
+                np.std(alturas_corpo) / (np.mean(alturas_corpo) + 1e-8)
+            )
+            regularidade_altura = float(np.exp(-variacao_altura))
+        else:
+            regularidade_altura = 0.5
+    elif len(alturas) == 2:
         variacao_altura = (
-            np.std(alturas) / (np.mean(alturas) + 1e-8)
+            abs(alturas[0] - alturas[1]) / (np.mean(alturas) + 1e-8)
         )
         regularidade_altura = float(np.exp(-variacao_altura))
     else:
+        # Uma palavra conectada não oferece alturas individuais para comparar.
         regularidade_altura = 0.5
 
-    # 6. Agrupar componentes por posição vertical
+    # 5. Agrupar componentes por linha usando a base inferior
     linhas = []
-
-    if len(componentes) >= 3:
-        posicoes_y = np.array(
-            [[c["cy"]] for c in componentes], dtype=float
-        )
-
-        grupos = DBSCAN(
-            eps=max(altura_mediana * 0.8, 1.0),
-            min_samples=2
-        ).fit_predict(posicoes_y)
+    if len(componentes) >= 2:
+        bases = np.array([[c["base"]] for c in componentes], dtype=float)
+        eps_linha = max(0.45 * altura_mediana, 8.0)
+        grupos = DBSCAN(eps=eps_linha, min_samples=2).fit_predict(bases)
 
         for grupo in sorted(set(grupos)):
             if grupo == -1:
                 continue
-
             linha = [
                 componentes[i]
                 for i in range(len(componentes))
                 if grupos[i] == grupo
             ]
-
             if len(linha) >= 2:
                 linha.sort(key=lambda c: c["x"])
                 linhas.append(linha)
 
-    # 7. Alinhamento: usar linhas identificadas quando possível.
+    # 6. Alinhamento e espaços horizontais observados
     alinhamentos = []
     todos_espacamentos = []
 
     for linha in linhas:
         X = np.array([[c["cx"]] for c in linha], dtype=float)
-        Y = np.array([c["cy"] for c in linha], dtype=float)
+        Y = np.array([c["base"] for c in linha], dtype=float)
 
-        if len(linha) >= 2 and np.ptp(X) > 0:
-            regressao = LinearRegression().fit(X, Y)
-            residuos = Y - regressao.predict(X)
-
-            erro_relativo = (
-                np.sqrt(np.mean(residuos ** 2)) / altura_mediana
-            )
-
-            score = np.exp(-np.log(2) * erro_relativo / 0.15)
-            alinhamentos.append(float(score))
+        if len(linha) >= 3 and np.ptp(X) > 0:
+            modelo = LinearRegression().fit(X, Y)
+            residuos = Y - modelo.predict(X)
+            mad = float(np.median(np.abs(residuos - np.median(residuos))))
+            erro_relativo = mad / altura_mediana
+            score_linha = float(np.exp(-np.log(2) * erro_relativo / 0.12))
+            alinhamentos.append((score_linha, len(linha)))
+        elif len(linha) == 2:
+            erro_relativo = float(np.std(Y) / altura_mediana)
+            score_linha = float(np.exp(-np.log(2) * erro_relativo / 0.12))
+            alinhamentos.append((score_linha, len(linha)))
 
         for atual, proxima in zip(linha[:-1], linha[1:]):
-            distancia = proxima["x"] - (atual["x"] + atual["w"])
-            todos_espacamentos.append(max(0.0, float(distancia)))
+            gap = proxima["x"] - (atual["x"] + atual["w"])
+            # Só espaços positivos informam separação entre as caixas.
+            if gap > 0:
+                todos_espacamentos.append(float(gap))
 
     if alinhamentos:
-        alinhamento = float(np.mean(alinhamentos))
-        metodo = "Componentes e linhas"
+        alinhamento = float(np.average(
+            [item[0] for item in alinhamentos],
+            weights=[item[1] for item in alinhamentos]
+        ))
+        metodo_alinhamento = "Linha de base dos componentes"
     else:
-        # Alternativa: medir quanto a tinta varia verticalmente
-        # ao longo da área ocupada pela escrita.
-        # É uma estimativa geométrica, não uma avaliação clínica.
-        projecao_y = np.sum(mascara, axis=1).astype(float)
-        linhas_ativas = np.where(projecao_y > 0)[0]
+        alinhamento = 0.5
+        metodo_alinhamento = "Estimativa neutra: poucos componentes para avaliar a linha"
 
-        if len(linhas_ativas) >= 2:
-            centros_y = ys.astype(float)
-            dispersao_vertical = np.std(centros_y) / max(altura_mediana, 1)
-            alinhamento = float(np.exp(-dispersao_vertical * 0.15))
-        else:
-            alinhamento = 0.5
-
-        metodo = "Análise global de fallback"
-
-    # 8. Dispersão horizontal entre componentes: 0 a 100%.
-    # Se não houver pares de componentes, usar a largura total
-    # da escrita em relação à altura como estimativa alternativa.
+    # 7. Dispersão real por espaços entre componentes (quando observável).
     if todos_espacamentos:
         distancia_media = float(np.mean(todos_espacamentos))
-        distancia_referencia = 2.0 * altura_mediana
-
-        dispersao_espacamento = float(np.clip(
-            distancia_media / max(distancia_referencia, 1.0) * 100,
-            0, 100
+        dispersao_componentes = float(np.clip(
+            distancia_media / max(2.0 * altura_mediana, 1.0) * 100.0,
+            0.0, 100.0
         ))
+        metodo_dispersao = "Espaços horizontais observados entre componentes"
     else:
-        razao_largura_altura = largura_escrita / max(altura_escrita, 1.0)
+        dispersao_componentes = None
+        metodo_dispersao = "Sem espaços vazios mensuráveis entre componentes"
 
-        # Referência ajustável; 8 alturas de largura = 100%.
-        dispersao_espacamento = float(np.clip(
-            razao_largura_altura / 8.0 * 100,
-            0, 100
-        ))
+    # 8. IF solicitado: um único componente representa uma palavra conectada.
+    # A contagem de letras vem do texto copiado ou de numero_letras.
+    # Essa métrica é mantida em coluna separada para não confundi-la com gaps.
+    dispersao_por_largura_letra = None
+    letras_consideradas = None
 
-    # 9. Grossura do traço usando distância dentro da máscara.
-    mascara_u8 = (mascara.astype(np.uint8) * 255)
+    if len(componentes) == 1:
+        if numero_letras is not None:
+            try:
+                letras_consideradas = int(numero_letras)
+            except (TypeError, ValueError):
+                letras_consideradas = None
+        elif texto_referencia:
+            letras_consideradas = sum(
+                caractere.isalpha() for caractere in texto_referencia
+            )
+
+        if letras_consideradas is not None and letras_consideradas > 0:
+            largura_media_por_letra = largura_escrita / letras_consideradas
+
+            # Altura aproximada do corpo de letra. É uma referência heurística
+            # porque a caixa do componente único inclui hastes, descendentes
+            # e floreios. A calibração ideal usa as avaliações do TCC.
+            altura_corpo_aproximada = max(1.0, 0.60 * altura_escrita)
+            referencia_largura = 2.0 * altura_corpo_aproximada
+
+            dispersao_por_largura_letra = float(np.clip(
+                largura_media_por_letra / referencia_largura * 100.0,
+                0.0, 100.0
+            ))
+
+            dispersao_componentes = dispersao_por_largura_letra
+
+    # 9. Grossura do traço
+    mascara = binaria > 0
     esqueleto = skeletonize(mascara)
+    mascara_u8 = mascara.astype(np.uint8) * 255
 
     if np.any(esqueleto):
         distancias = cv2.distanceTransform(
@@ -235,23 +241,43 @@ def dados_escrita(path):
     else:
         grossura = 0.0
 
-    # 10. Legibilidade estimada.
-    # Os pesos e a medida global são provisórios e precisam de validação.
-    legibilidade_estimada = (
-        0.50 * alinhamento
-        + 0.30 * regularidade_altura
-        + 0.20 * (1.0 - dispersao_espacamento / 100.0)
-    )
+    # 10. Legibilidade. A estimativa por largura/letra não entra aqui,
+    # porque não é equivalente a espaçamento real entre letras.
+    if dispersao_componentes is not None:
+        legibilidade_estimada = (
+            0.50 * alinhamento
+            + 0.30 * regularidade_altura
+            + 0.20 * (1.0 - dispersao_componentes / 100.0)
+        )
+        metodo_legibilidade = "Inclui espaçamento observado"
+    else:
+        legibilidade_estimada = (
+            0.50 * alinhamento + 0.30 * regularidade_altura
+        ) / 0.80
+        metodo_legibilidade = "Pesos redistribuídos: espaçamento real não mensurável"
 
     return {
         "Legibilidade Estimada": round(legibilidade_estimada * 100, 2),
-        "Tamanho da Letra": round(tamanho_letra * 100, 2),
+        "Tamanho da Letra": round(tamanho_letra, 2),
         "Se está na mesma linha": round(alinhamento * 100, 2),
-        "Dispersão entre componentes": round(dispersao_espacamento, 2),
+        "Dispersão entre componentes (%)": (
+            None if dispersao_componentes is None
+            else round(dispersao_componentes, 2)
+        ),
         "Grossura do Traço": round(grossura * 100, 2)
     }
 
 
-print(pd.DataFrame([dados_escrita("models/e02.jpeg")]))
+if __name__ == "__main__":
+    caminho = "models/e05.jpeg"
 
-tabela_dados = pd.DataFrame([dados_escrita("models/e02.jpeg")])
+    # IMPORTANTE: substitua pelo texto exato que a criança copiou.
+    texto_referencia = "Renato"
+
+    resultado = dados_escrita(
+        caminho,
+        texto_referencia=texto_referencia
+    )
+
+    tabela_dados = pd.DataFrame([resultado])
+    print(tabela_dados.to_string(index=False))
