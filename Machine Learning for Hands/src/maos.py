@@ -9,14 +9,14 @@ import os
 
 
 
-LABEL = "Mao_Aberta"
+LABEL = "Palmar"
 OUTPUT_DIR = f"data/{LABEL}"
 CSV_FILE = "dataset.csv"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-header = ["image_path", "label"]
+header = ["label"]
 
 for i in range(21):
     header += ([f"x{i}"], [f"y{i}"], [f"z{i}"])
@@ -72,8 +72,8 @@ while True:
         #print(contador)
         #print(pontos)
 
-        cv2.putText(img, f"Rotulo: {LABEL}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-        cv2.putText(img, "S = salvar | Q = sair", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        cv2.putText(img, f"Rotulo: {LABEL}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+        cv2.putText(img, "S = salvar | Q = sair", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
         
 
 
@@ -85,19 +85,13 @@ while True:
 
     if key == ord("s"):
         if points is not None:
-            image_name = f"frame_{frame_count:04d}.jpg"
-            image_path = os.path.join(OUTPUT_DIR, image_name)
+           
 
-            cv2.imwrite(image_path, img)
-
-            row = [image_path, LABEL] + pontos
+            row = [LABEL] + pontos
 
             with open(CSV_FILE, mode="a", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow(row)
-            
-            print(f"Salvo: {image_path}")
-            frame_count += 1
         else:
             print("Nenhuma mão detectada. Não salvou.")
     elif key == ord("q"):

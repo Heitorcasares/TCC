@@ -63,7 +63,7 @@ while True:
             (10, 40),
             cv2.FONT_HERSHEY_SIMPLEX,
             1,
-            (255, 255, 255),
+            (0, 0, 0),
             2
         )
 
